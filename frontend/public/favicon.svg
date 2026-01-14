@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <path d="M256 0C256 0 256 64 256 64C150 64 64 150 64 256C64 362 150 448 256 448C362 448 448 362 448 256C448 150 362 64 256 64" fill="url(#shieldGrad)" opacity="0.1"/>
+  
+  <path d="M256 32L56 112V248C56 376 142 494 256 512C370 494 456 376 456 248V112L256 32Z" fill="url(#shieldGrad)" filter="url(#glow)"/>
+  
+  <path d="M256 112L392 168V248C392 344 334 430 256 456C178 430 120 344 120 248V168L256 112Z" fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <path d="M256 192L296 232L256 272L216 232L256 192Z" fill="white"/>
+</svg>
