@@ -45,6 +45,9 @@ body {
   background-color: var(--bg-light);
   color: var(--text-main);
   line-height: 1.6;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll on mobile */
+  width: 100%;
 }
 
 a {
@@ -217,11 +220,12 @@ ul {
   width: 100%;
   background: white;
   border-top: 1px solid var(--border);
-  padding: 1rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 999;
 }
 
 /* Hero Section */
@@ -472,7 +476,16 @@ ul {
 
   .hero-actions {
     flex-direction: column;
-    padding: 0 2rem;
+    padding: 0 1rem;
+    gap: 1rem;
+    align-items: stretch;
+    /* Full width buttons on mobile */
+  }
+
+  /* Center buttons properly */
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .features-grid {
