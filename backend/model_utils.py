@@ -47,8 +47,8 @@ class MetaFeatureExtractor(BaseEstimator, TransformerMixin):
     """Extracts structural features: Length, Caps Ratio, Punctuation, Spam Density."""
     
     SPAM_KEYWORDS = {
-        'free', 'win', 'winner', 'cash', 'prize', 'urgent', 'claim', 
-        'congrats', 'guaranteed', 'call', 'loans', 'risk', 'investment'
+        'free', 'win', 'winner', 'cash', 'prize', 'claim', 
+        'congrats', 'guaranteed', 'loans', 'investment', 'offer'
     }
 
     def fit(self, X, y=None):
@@ -65,19 +65,23 @@ class MetaFeatureExtractor(BaseEstimator, TransformerMixin):
         return np.array(features)
 
     def _extract_features(self, text):
-        blob = TextBlob(text)
+        # Truncate text for meta-feature extraction performance (TextBlob is slow on long texts)
+        # 1000 chars is enough to get "flavor" (caps, sentiment) of the message
+        analysis_text = text[:1000]
+        
+        blob = TextBlob(analysis_text)
         length = len(text)
         if length == 0: length = 1
         
-        caps_count = sum(1 for c in text if c.isupper())
-        caps_ratio = caps_count / length
+        caps_count = sum(1 for c in analysis_text if c.isupper())
+        caps_ratio = caps_count / len(analysis_text) if len(analysis_text) > 0 else 0
 
-        punct_count = sum(1 for c in text if c in string.punctuation)
+        punct_count = sum(1 for c in analysis_text if c in string.punctuation)
         
         sentiment = blob.sentiment.polarity
         subjectivity = blob.sentiment.subjectivity
 
-        words = text.lower().split()
+        words = analysis_text.lower().split()
         word_count = len(words) if len(words) > 0 else 1
         spam_word_count = sum(1 for w in words if w in self.SPAM_KEYWORDS)
         spam_density = spam_word_count / word_count

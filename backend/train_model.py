@@ -11,6 +11,7 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, classification_report
+from sklearn.preprocessing import StandardScaler
 
 # Import custom model classes specifically for correct pickling
 try:
@@ -46,15 +47,60 @@ def train_advanced():
     download_data()
     
     # Load Data
+    # 1. Load SMS Data
     try:
-        df = pd.read_csv(DATA_FILE, sep='\t', names=['label', 'text'])
+        df_sms = pd.read_csv(DATA_FILE, sep='\t', names=['label', 'text'])
+        df_sms['source'] = 'sms'
     except Exception:
-        print("Error reading dataset.")
+        print("Error reading SMS dataset.")
         return
 
-    print(f"Loaded {len(df)} messages.")
+    # 2. Load Enron Email Data
+    enron_path = "../enron-spam-datasets/enron_spam_data.csv"
+    df_enron = pd.DataFrame()
+    if os.path.exists(enron_path):
+        try:
+            # Enron CSV: Subject, Message, Spam/Ham, Date
+            # We combine Subject + Message for training
+            df_enron = pd.read_csv(enron_path, usecols=['Subject', 'Message', 'Spam/Ham'])
+            df_enron['text'] = df_enron['Subject'].fillna('') + " " + df_enron['Message'].fillna('')
+            df_enron['label'] = df_enron['Spam/Ham'] # Already 'spam'/'ham'
+            df_enron = df_enron[['label', 'text']]
+            df_enron['source'] = 'enron'
+            print(f"Loaded {len(df_enron)} Enron emails.")
+            
+            # Optimization: Downsample Enron to 1000 samples to balance with SMS (4800) 
+            # and allow reasonable training time on local machine.
+            if len(df_enron) > 1000:
+                df_enron = df_enron.sample(n=1000, random_state=42)
+                print("Downsampled Enron to 1000 random samples for speed.")
+
+        except Exception as e:
+            print(f"Error reading Enron dataset: {e}")
+
+    # 3. Load Custom User Data (Human-in-the-Loop)
+    custom_path = "custom_data.csv"
+    df_custom = pd.DataFrame()
+    if os.path.exists(custom_path):
+        try:
+            df_custom = pd.read_csv(custom_path)
+            # Ensure text/label columns exist
+            if 'text' in df_custom.columns and 'label' in df_custom.columns:
+                 df_custom['source'] = 'custom'
+                 print(f"Loaded {len(df_custom)} custom samples.")
+        except Exception as e:
+            print(f"Error reading custom data: {e}")
+
+    # Combine All
+    df = pd.concat([df_sms, df_enron, df_custom], ignore_index=True)
+    print(f"Total Combined Training Data: {len(df)} samples.")
+
+    # Convert Labels: ham -> 0, spam -> 1
     df['target'] = df['label'].map({'ham': 0, 'spam': 1})
     
+    # Drop NaNs
+    df.dropna(subset=['text', 'target'], inplace=True)
+
     X = df['text']
     y = df['target']
     
@@ -71,7 +117,10 @@ def train_advanced():
                 ('cleaner', TextTransformer()),
                 ('tfidf', TfidfVectorizer(max_features=5000, ngram_range=(1, 3))) 
             ])),
-            ('meta_pipeline', MetaFeatureExtractor())
+            ('meta_pipeline', Pipeline([
+                ('extractor', MetaFeatureExtractor()),
+                ('scaler', StandardScaler())
+            ]))
         ])),
         ('clf', SGDClassifier(loss='hinge', max_iter=1000, tol=1e-3, random_state=42))
     ])
