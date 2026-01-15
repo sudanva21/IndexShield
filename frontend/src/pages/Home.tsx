@@ -43,12 +43,7 @@ export default function Home() {
                 </div>
 
                 {/* Decorative Background Elements */}
-                <div style={{
-                    position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                    width: '600px', height: '600px',
-                    background: 'linear-gradient(to top right, var(--accent), #a855f7)',
-                    opacity: 0.15, filter: 'blur(80px)', borderRadius: '50%', zIndex: 0
-                }} />
+                <div className="hero-blob" />
             </section>
 
             {/* Features Grid */}

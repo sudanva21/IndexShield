@@ -7,8 +7,8 @@ export default function Technology() {
             <section style={{ padding: '5rem 0' }}>
                 <div className="container" style={{ maxWidth: '800px' }}>
                     <div className="text-center" style={{ marginBottom: '4rem' }}>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--primary)' }}>Under the Hood</h1>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>
+                        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 800, marginBottom: '1rem', color: 'var(--primary)' }}>Under the Hood</h1>
+                        <p style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)', color: 'var(--text-muted)' }}>
                             How InboxShield distinguishes between valuable messages and digital noise.
                         </p>
                     </div>
